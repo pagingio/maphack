@@ -28,8 +28,9 @@ DWORD GetStromAddr()
 // game.dllµÄµØÖ·
 DWORD GetGameAddr()
 {
-  if (g_GameBase == NULL)
+  while (g_GameBase == NULL)
   {
+    Sleep(1000);
     g_GameBase = (DWORD)GetModuleHandleA("Game.dll");
   }
   return g_GameBase;
@@ -247,7 +248,7 @@ void __declspec(naked) HookedEndScene()
 DWORD WINAPI HookEndScene(LPVOID lpThreadParameter)
 {
   DWORD     address;
-  DWORD     object;
+  DWORD     object = NULL;
   DWORD     direct3D8;
 
   ::OutputDebugStringA(" ---- hook end scene ----");
@@ -255,7 +256,11 @@ DWORD WINAPI HookEndScene(LPVOID lpThreadParameter)
   address = GetGameAddr() + 0xAC519C;
   DebugString("---- address:0x%.8x", address);
 
-  object = *(DWORD*)address;
+  while (object == NULL)
+  {
+    Sleep(1000);
+    object = *(DWORD*)address;
+  }
 
   direct3D8 = *(DWORD*)(object + 0x584);
   direct3D8 = *(DWORD*)direct3D8;
